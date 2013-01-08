@@ -1,5 +1,7 @@
 package me.moocar.logbackgelf;
 
+import org.slf4j.MDC;
+
 import ch.qos.logback.core.AppenderBase;
 
 import java.io.*;
@@ -35,14 +37,14 @@ public class GelfAppender<E> extends AppenderBase<E> {
     private static final int maxChunks = 127;
     private int messageIdLength = 32;
     private boolean padSeq = true;
-    private final byte[] chunkedGelfId = new byte[]{0x1e, 0x0f};
+    private final byte[] chunkedGelfId = new byte[] { 0x1e, 0x0f };
 
     private AppenderExecutor<E> appenderExecutor;
 
     /**
      * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
      * to the log server
-     *
+     * 
      * @param logEvent The event that we are logging
      */
     @Override
@@ -89,7 +91,13 @@ public class GelfAppender<E> extends AppenderBase<E> {
                 padSeq = false;
             }
 
-            String hostname = getLocalHostName();
+            String hostname = null;
+            String originalHost = System.getProperty("originalHost");
+            if (originalHost != null) {
+                hostname = originalHost;
+            } else {
+                hostname = getLocalHostName();
+            }
 
             PayloadChunker payloadChunker = new PayloadChunker(chunkThreshold, maxChunks,
                     new MessageIdProvider(messageIdLength, MessageDigest.getInstance("MD5"), hostname),
@@ -122,7 +130,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
     /**
      * Gets the Inet address for the graylog2ServerHost and gives a specialised error message if an exception is thrown
-     *
+     * 
      * @return The Inet address for graylog2ServerHost
      */
     private InetAddress getInetAddress() {
@@ -180,17 +188,17 @@ public class GelfAppender<E> extends AppenderBase<E> {
     public void setUseLoggerName(boolean useLoggerName) {
         this.useLoggerName = useLoggerName;
     }
-    
+
     /**
      * If true, an additional field call "_threadName" will be added to each gelf message. Its contents will be the
      * Name of the thread. Defaults to "false".
      */
     public boolean isUseThreadName() {
-    	return useThreadName;
+        return useThreadName;
     }
-    
+
     public void setUseThreadName(boolean useThreadName) {
-    	this.useThreadName = useThreadName;
+        this.useThreadName = useThreadName;
     }
 
     /**
@@ -212,7 +220,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
     /**
      * Add an additional field. This is mainly here for compatibility with logback.xml
-     *
+     * 
      * @param keyValue This must be in format key:value where key is the MDC key, and value is the GELF field
      * name. e.g "ipAddress:_ip_address"
      */
