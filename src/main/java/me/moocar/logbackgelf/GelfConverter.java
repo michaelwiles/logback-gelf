@@ -24,19 +24,16 @@ public class GelfConverter<E> {
     private final String hostname;
     private final Gson gson;
     private final PatternLayout patternLayout;
+    private final Map<String, String> additionalStaticFields;
 
-    public GelfConverter(String facility,
-                         boolean useLoggerName,
-                         boolean useThreadName,
-                         Map<String, String> additionalFields,
-                         int shortMessageLength,
-                         String hostname,
-                         String messagePattern) {
+    public GelfConverter(String facility, boolean useLoggerName, boolean useThreadName, Map<String, String> additionalFields,
+            Map<String, String> additionalStaticFields, int shortMessageLength, String hostname, String messagePattern) {
 
         this.facility = facility;
         this.useLoggerName = useLoggerName;
         this.useThreadName = useThreadName;
         this.additionalFields = additionalFields;
+        this.additionalStaticFields = additionalStaticFields;
         this.shortMessageLength = shortMessageLength;
         this.hostname = hostname;
 
@@ -52,8 +49,9 @@ public class GelfConverter<E> {
 
     /**
      * Converts a log event into GELF JSON.
-     *
-     * @param logEvent The log event we're converting
+     * 
+     * @param logEvent
+     *            The log event we're converting
      * @return The log event converted into GELF JSON
      */
     public String toGelf(E logEvent) {
@@ -66,8 +64,9 @@ public class GelfConverter<E> {
 
     /**
      * Creates a map of properties that represent the GELF message.
-     *
-     * @param logEvent The log event
+     * 
+     * @param logEvent
+     *            The log event
      * @return map of gelf properties
      */
     private Map<String, Object> mapFields(E logEvent) {
@@ -100,18 +99,25 @@ public class GelfConverter<E> {
 
     /**
      * Converts the additional fields into proper GELF JSON
-     *
-     * @param map The map of additional fields
-     * @param eventObject The Logging event that we are converting to GELF
+     * 
+     * 
+     * @param map
+     *            The map of additional fields
+     * @param eventObject
+     *            The Logging event that we are converting to GELF
      */
     private void additionalFields(Map<String, Object> map, ILoggingEvent eventObject) {
+
+        for (Map.Entry<String, String> entry : additionalStaticFields.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
 
         if (useLoggerName) {
             map.put("_loggerName", eventObject.getLoggerName());
         }
-        
+
         if (useThreadName) {
-        	map.put("_threadName", eventObject.getThreadName());
+            map.put("_threadName", eventObject.getThreadName());
         }
 
         Map<String, String> mdc = eventObject.getMDCPropertyMap();

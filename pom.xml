@@ -76,6 +76,18 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
@@ -100,9 +112,9 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
-			<plugin>
-                <!-- be sure to add github.global.userName and  github.global.password to your profile properties in  settings.xml -->
-				<!-- run with mvn clean install assembly:single ghDownloads:upload -->
+<!-- 			<plugin>
+				be sure to add github.global.userName and github.global.password to your profile properties in settings.xml
+				run with mvn clean install assembly:single ghDownloads:upload
 				<groupId>com.github.github</groupId>
 				<artifactId>downloads-maven-plugin</artifactId>
 				<version>0.4</version>
@@ -112,20 +124,34 @@
 					<includeAttached>true</includeAttached>
 				</configuration>
 			</plugin>
-	    <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-gpg-plugin</artifactId>
-	      <version>1.4</version>
-              <executions>
-		<execution>
-		  <id>sign-artifacts</id>
-		  <phase>verify</phase>
-		  <goals>
-		    <goal>sign</goal>
-		  </goals>
-		</execution>
-              </executions>
-	    </plugin>
+ -->		<!-- 	<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> -->
 		</plugins>
 	</build>
+	
+		<distributionManagement>
+		<repository>
+			<id>remote-plugins-release</id>
+			<name>artifactory.afrozaar.com-releases</name>
+			<url>https://flask.afrozaar.com/artifactory/libs-release-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>remote-plugins-snapshot</id>
+			<name>artifactory.afrozaar.com-snapshots</name>
+			<url>https://flask.afrozaar.com/artifactory/libs-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 </project>
